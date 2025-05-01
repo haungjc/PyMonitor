@@ -1,0 +1,5 @@
+2025-04-30 19:28:51 INFO: 用户登录邮箱：1450302343@qq.com
+2025-04-30 19:33:50 INFO: 开始运行脚本，Conda 环境：D:/anaconda3/envs/BOProject\python.exe，脚本路径：D:/$黄璟纯/研究生学习/研究生学习/代码/学点东西/莫内/DG-AGDRL/DGDRL/data_process.py
+2025-04-30 19:33:54 INFO: 对齐后股票支数为: 142
+2025-04-30 19:33:54 INFO: 2024年有效天数: 242
+2025-04-30 19:33:54 INFO: 邮件发送成功 to=1450302343@qq.com subject=PyMonitor：运行成功通知

@@ -1,0 +1,60 @@
+2025-04-30 19:13:34 INFO: ÓÃ»§µÇÂ¼ÓÊÏä£º1450302343@qq.com
+2025-04-30 19:13:53 INFO: ¿ªÊ¼ÔËÐÐ½Å±¾£¬Conda »·¾³£ºD:/anaconda3/envs/BOProject\python.exe£¬½Å±¾Â·¾¶£ºD:/$»Æ­Z´¿/ÑÐ¾¿ÉúÑ§Ï°/ÑÐ¾¿ÉúÑ§Ï°/´úÂë/Ñ§µã¶«Î÷/ÄªÄÚ/DG-AGDRL/DGDRL/data_process.py
+2025-04-30 19:13:57 INFO: ¶ÔÆëºó¹ÉÆ±Ö§ÊýÎª: 142
+2025-04-30 19:13:57 INFO: 2024ÄêÓÐÐ§ÌìÊý: 242
+2025-04-30 19:13:58 INFO: ÓÊ¼þ·¢ËÍ³É¹¦ to=1450302343@qq.com subject=PyMonitor£ºÔËÐÐ³É¹¦Í¨Öª
+2025-04-30 19:16:55 INFO: ¿ªÊ¼ÔËÐÐ½Å±¾£¬Conda »·¾³£ºD:/anaconda3/envs/BOProject\python.exe£¬½Å±¾Â·¾¶£ºD:/$»Æ­Z´¿/ÑÐ¾¿ÉúÑ§Ï°/ÑÐ¾¿ÉúÑ§Ï°/´úÂë/Ñ§µã¶«Î÷/ÄªÄÚ/DG-AGDRL/DGDRL/train.py
+2025-04-30 19:16:57 INFO: Traceback (most recent call last):
+2025-04-30 19:16:57 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\train.py", line 1, in <module>
+2025-04-30 19:16:57 INFO:     from data_loader import Dataloader
+2025-04-30 19:16:57 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\data_loader.py", line 6, in <module>
+2025-04-30 19:16:57 INFO:     from transformers import AutoTokenizer, AutoModel
+2025-04-30 19:16:57 INFO: ModuleNotFoundError: No module named 'transformers'
+2025-04-30 19:16:58 INFO: [0m
+2025-04-30 19:16:59 INFO: ÓÊ¼þ·¢ËÍ³É¹¦ to=1450302343@qq.com subject=PyMonitor£ºÔËÐÐÊ§°ÜÍ¨Öª
+2025-04-30 19:17:52 INFO: ¿ªÊ¼ÔËÐÐ½Å±¾£¬Conda »·¾³£ºD:/anaconda3/envs/DGDRL\python.exe£¬½Å±¾Â·¾¶£ºD:/$»Æ­Z´¿/ÑÐ¾¿ÉúÑ§Ï°/ÑÐ¾¿ÉúÑ§Ï°/´úÂë/Ñ§µã¶«Î÷/ÄªÄÚ/DG-AGDRL/DGDRL/train.py
+2025-04-30 19:19:10 INFO: Traceback (most recent call last):
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\train.py", line 304, in <module>
+2025-04-30 19:19:10 INFO:     data_dict, val_data, n_stocks =main()
+2025-04-30 19:19:10 INFO:                                    ^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\train.py", line 276, in main
+2025-04-30 19:19:10 INFO:     train_agdrl_calmar(
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\train.py", line 215, in train_agdrl_calmar
+2025-04-30 19:19:10 INFO:     actor_loss, critic_loss = agent.update(trajectories)
+2025-04-30 19:19:10 INFO:                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\model\DGDRL_new.py", line 387, in update
+2025-04-30 19:19:10 INFO:     new_logprobs, state_values = self._evaluate_batch(batch_states, batch_actions)
+2025-04-30 19:19:10 INFO:                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\model\DGDRL_new.py", line 342, in _evaluate_batch
+2025-04-30 19:19:10 INFO:     _, weights, _ = self.actor(st_dict)
+2025-04-30 19:19:10 INFO:                     ^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1511, in _wrapped_call_impl
+2025-04-30 19:19:10 INFO:     return self._call_impl(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1520, in _call_impl
+2025-04-30 19:19:10 INFO:     return forward_call(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\model\DGDRL_new.py", line 252, in forward
+2025-04-30 19:19:10 INFO:     E_final = self.rel_att(H_l, news_adj, sector_adj)  # (bs, N, d_att)
+2025-04-30 19:19:10 INFO:               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1511, in _wrapped_call_impl
+2025-04-30 19:19:10 INFO:     return self._call_impl(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1520, in _call_impl
+2025-04-30 19:19:10 INFO:     return forward_call(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\model\DGDRL_new.py", line 202, in forward
+2025-04-30 19:19:10 INFO:     static_out = self.long_gat(h_lstm, sector_adj)
+2025-04-30 19:19:10 INFO:                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1511, in _wrapped_call_impl
+2025-04-30 19:19:10 INFO:     return self._call_impl(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\anaconda3\envs\DGDRL\Lib\site-packages\torch\nn\modules\module.py", line 1520, in _call_impl
+2025-04-30 19:19:10 INFO:     return forward_call(*args, **kwargs)
+2025-04-30 19:19:10 INFO:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO:   File "D:\$»Æ­Z´¿\ÑÐ¾¿ÉúÑ§Ï°\ÑÐ¾¿ÉúÑ§Ï°\´úÂë\Ñ§µã¶«Î÷\ÄªÄÚ\DG-AGDRL\DGDRL\model\DGDRL_new.py", line 173, in forward
+2025-04-30 19:19:10 INFO:     e = torch.cat([Wh_i, Wh_j], dim=3)
+2025-04-30 19:19:10 INFO:         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-04-30 19:19:10 INFO: torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 8.00 GiB of which 0 bytes is free. Of the allocated memory 22.07 GiB is allocated by PyTorch, and 407.37 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+2025-04-30 19:19:12 INFO: [0m
+2025-04-30 19:19:14 INFO: ÓÊ¼þ·¢ËÍ³É¹¦ to=1450302343@qq.com subject=PyMonitor£ºÔËÐÐÊ§°ÜÍ¨Öª

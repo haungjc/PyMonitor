@@ -1,0 +1,10 @@
+{
+  "env_paths": [
+    "D:/anaconda3/envs/DGDRL\\python.exe",
+    "D:/anaconda3/envs/BOProject\\python.exe"
+  ],
+  "script_paths": [
+    "D:/$黄璟纯/研究生学习/研究生学习/代码/学点东西/莫内/DG-AGDRL/DGDRL/train.py",
+    "D:/$黄璟纯/研究生学习/研究生学习/代码/学点东西/莫内/DG-AGDRL/DGDRL/data_process.py"
+  ]
+}
