@@ -3,13 +3,45 @@ import os
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QHBoxLayout, QCompleter
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QStringListModel
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QStringListModel, QThread
 from PyQt5.QtGui import QFont
 import random
 import smtplib
 from email.mime.text import MIMEText
 import logging
 from datetime import datetime
+
+class EmailSenderThread(QThread):
+    success = pyqtSignal()
+    failure = pyqtSignal(str)
+
+    def __init__(self, to_email, code):
+        super().__init__()
+        self.to_email = to_email
+        self.code = code
+
+    def run(self):
+        try:
+            smtp_server = "smtp.163.com"
+            smtp_port = 465
+            sender_email = "18656987650@163.com"
+            sender_password = "AHhDF3AwsyEUk8LM"
+
+            subject = "PyMonitor 验证码"
+            body = f"Dear:\n     您的验证码是：{self.code}(有效期3分钟),我们悄咪咪的,不要告诉别人哦~"
+
+            msg = MIMEText(body, "plain", "utf-8")
+            msg["Subject"] = subject
+            msg["From"] = sender_email
+            msg["To"] = self.to_email
+
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, self.to_email, msg.as_string())
+            server.quit()
+            self.success.emit()
+        except Exception as e:
+            self.failure.emit(str(e))
 
 
 class EmailLoginDialog(QDialog):
@@ -161,22 +193,27 @@ class EmailLoginDialog(QDialog):
         self.verification_code = f"{random.randint(100000, 999999)}"
         self.target_email = email
 
-        try:
-            self.send_email(self.target_email, self.verification_code)
-            self.code_tip_label.setText("验证码已发送")
-            self.code_tip_label.setFont(QFont("微软雅黑", 12))
-            self.code_tip_label.setVisible(True)
-            self.code_input.setVisible(True)
-            self.verify_button.setVisible(True)
+        self.sender_thread = EmailSenderThread(email, self.verification_code)
+        self.sender_thread.success.connect(self.on_send_success)
+        self.sender_thread.failure.connect(self.on_send_failure)
+        self.sender_thread.start()
 
-            self.send_code_button.setDisabled(True)
-            self.countdown = 60
-            self.send_code_button.setText("重新发送 (60)")
-            self.timer.start(1000)
+    def on_send_success(self):
+        self.code_tip_label.setText("验证码已发送")
+        self.code_tip_label.setFont(QFont("微软雅黑", 12))
+        self.code_tip_label.setVisible(True)
+        self.code_input.setVisible(True)
+        self.verify_button.setVisible(True)
 
-            QMessageBox.information(self, "发送成功", f"验证码已发送！请查收邮箱。")
-        except Exception as e:
-            QMessageBox.critical(self, "发送失败", f"邮件发送失败：\n{str(e)}")
+        self.send_code_button.setDisabled(True)
+        self.countdown = 60
+        self.send_code_button.setText("重新发送 (60)")
+        self.timer.start(1000)
+
+        QMessageBox.information(self, "发送成功", f"验证码已发送！请查收邮箱。")
+
+    def on_send_failure(self, error_msg):
+        QMessageBox.critical(self, "发送失败", f"邮件发送失败：\n{error_msg}")
 
     def verify_code(self):
         entered = self.code_input.text().strip()

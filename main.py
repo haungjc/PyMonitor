@@ -1,7 +1,14 @@
-import locale
 import smtplib
 import sys
 import os
+if hasattr(sys, "_MEIPASS"):
+    plugin_path = os.path.join(sys._MEIPASS, 'qt_plugins', 'platforms')
+else:
+    plugin_path = os.path.join(os.path.dirname(sys.executable), 'qt_plugins', 'platforms')
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
+# print("QT_QPA_PLATFORM_PLUGIN_PATH =", os.environ.get("QT_QPA_PLATFORM_PLUGIN_PATH"))
+# print("目录存在吗？", os.path.isdir(plugin_path))
+# print("目录内容:", os.listdir(plugin_path))
 import json
 import logging
 from datetime import datetime, timedelta
@@ -9,12 +16,11 @@ from email.mime.text import MIMEText
 from PyQt5.QtWidgets import QToolButton, QMenu, QAction, QHBoxLayout, QDialog
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QDialog
-import subprocess
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog,
     QMessageBox, QComboBox, QLabel, QTextEdit
 )
-from PyQt5.QtCore import QThread, pyqtSignal, QPoint, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, QPoint, Qt, QLibraryInfo, QObject, pyqtSlot
 from PyQt5.QtGui import QCursor
 from menu import AboutDialog
 from login import EmailLoginDialog
@@ -38,29 +44,77 @@ def save_history(env_paths, script_paths):
 
 
 # ========== 子线程运行器 ==========
-class ProcessRunner(QThread):
-    output_signal = pyqtSignal(str)
+# class ProcessRunner(QThread):
+#     output_signal = pyqtSignal(str)
+#     finished_signal = pyqtSignal(int)
+#
+#     def __init__(self, python_path, script_path):
+#         super().__init__()
+#         self.python_path = python_path
+#         self.script_path = script_path
+#         self.output_lines = []
+#
+#     def run(self):
+#         try:
+#             script_dir = os.path.dirname(self.script_path)
+#             # 在 Windows 上隐藏子进程窗口
+#             startupinfo = None
+#             if os.name == 'nt':
+#                 startupinfo = subprocess.STARTUPINFO()
+#                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+#             process = subprocess.Popen(
+#                 [self.python_path, self.script_path],
+#                 stdout=subprocess.PIPE,
+#                 stderr=subprocess.STDOUT,
+#                 cwd=script_dir,
+#                 bufsize=1,
+#                 universal_newlines=True,
+#                 encoding=locale.getpreferredencoding(False),
+#                 errors='replace',
+#                 startupinfo=startupinfo
+#             )
+#
+#             for line in process.stdout:
+#                 text = line.rstrip()
+#                 self.output_lines.append(text)
+#                 self.output_signal.emit(text)
+#
+#             process.stdout.close()
+#             return_code = process.wait()
+#             self.finished_signal.emit(return_code)
+#
+#         except Exception as e:
+#             self.output_signal.emit(f"[运行错误] {str(e)}")
+#             self.finished_signal.emit(-1)
+
+
+# ========== 主界面 ==========
+class RunnerWorker(QObject):
+    output_signal   = pyqtSignal(str)
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, python_path, script_path):
-        super().__init__()
+    def __init__(self, python_path: str, script_path: str, parent=None):
+        super().__init__(parent)
         self.python_path = python_path
         self.script_path = script_path
         self.output_lines = []
 
-    def run(self):
+    @pyqtSlot()  # QThread 启动后会调用
+    def process(self):
+        import subprocess, os, locale
         try:
-            script_dir = os.path.dirname(self.script_path)
-            # 在 Windows 上隐藏子进程窗口
+            cmd = [self.python_path, self.script_path]
+            # Windows 下隐藏子进程窗口
             startupinfo = None
             if os.name == 'nt':
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            process = subprocess.Popen(
-                [self.python_path, self.script_path],
+
+            proc = subprocess.Popen(
+                cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                cwd=script_dir,
+                cwd=os.path.dirname(self.script_path),
                 bufsize=1,
                 universal_newlines=True,
                 encoding=locale.getpreferredencoding(False),
@@ -68,21 +122,24 @@ class ProcessRunner(QThread):
                 startupinfo=startupinfo
             )
 
-            for line in process.stdout:
+            # 实时读取输出并发射信号
+            for line in proc.stdout:
                 text = line.rstrip()
                 self.output_lines.append(text)
                 self.output_signal.emit(text)
+            proc.stdout.close()
 
-            process.stdout.close()
-            return_code = process.wait()
-            self.finished_signal.emit(return_code)
+            # 等待进程结束，发射退出码
+            ret = proc.wait()
+            self.finished_signal.emit(ret)
 
         except Exception as e:
-            self.output_signal.emit(f"[运行错误] {str(e)}")
+            err = f"[运行错误] {e}"
+            self.output_lines.append(err)
+            self.output_signal.emit(err)
             self.finished_signal.emit(-1)
 
 
-# ========== 主界面 ==========
 class MonitorApp(QWidget):
     def __init__(self, email_address=None):
         super().__init__()
@@ -280,9 +337,25 @@ class MonitorApp(QWidget):
                 save_history(self.history["env_paths"], self.history["script_paths"])
 
     def run_and_monitor(self):
+        # 防止多次点击running并发
+        if hasattr(self, 'runner_thread') and self.runner_thread.isRunning():
+            try:
+                self.runner_worker.output_signal.disconnect(self.handle_output)
+                self.runner_worker.finished_signal.disconnect(self.handle_finished)
+            except Exception:
+                pass
+            # 请求线程退出并等待
+            self.runner_thread.quit()
+            self.runner_thread.wait()
+            # 删除旧对象
+            self.runner_worker.deleteLater()
+            self.runner_thread.deleteLater()
+
         env_path = self.env_combo.currentText()
         script_path = self.script_combo.currentText()
         logging.info(f"开始运行脚本，Conda 环境：{env_path}，脚本路径：{script_path}")
+
+        # 参数校验
         if not os.path.isfile(env_path):
             QMessageBox.warning(self, "错误", "无效的 Conda Python 路径")
             return
@@ -290,22 +363,42 @@ class MonitorApp(QWidget):
             QMessageBox.warning(self, "错误", "无效的 Python 可执行文件路径")
             return
 
+        # 清空输出
         self.output_console.clear()
         self.output_console.append(f">>> 开始执行：{script_path}\n")
 
-        self.runner = ProcessRunner(env_path, script_path)
-        self.runner.output_signal.connect(self.handle_output)
-        self.runner.finished_signal.connect(self.handle_finished)
-        self.runner.start()
+        # ─── 2. 新建线程 + Worker ────────────────────────────────────────
+        self._runner_thread = QThread()
+        self._runner_worker = RunnerWorker(env_path, script_path)
+        self._runner_worker.moveToThread(self._runner_thread)
+
+        # 保存引用，给后面 handle_finished 用
+        self.runner_thread = self._runner_thread
+        self.runner_worker = self._runner_worker
+
+        # ─── 3. 信号绑定 ─────────────────────────────────────────────
+        self._runner_worker.output_signal.connect(self.handle_output)
+        self._runner_worker.finished_signal.connect(self.handle_finished)
+
+        # 线程启动后调用 worker.process
+        self._runner_thread.started.connect(self._runner_worker.process)
+        # 任务完成后退出线程并释放资源
+        self._runner_worker.finished_signal.connect(self._runner_thread.quit)
+        self._runner_worker.finished_signal.connect(self._runner_worker.deleteLater)
+        self._runner_thread.finished.connect(self._runner_thread.deleteLater)
+
+        # ─── 4. 启动线程 ─────────────────────────────────────────────
+        self._runner_thread.start()
+
 
     def exit_app(self):
         # 1. 隐藏托盘图标
         self.tray_icon.hide()
 
         # 2. 停止可能运行中的线程
-        if hasattr(self, 'runner') and self.runner.isRunning():
-            self.runner.terminate()
-            self.runner.wait()
+        if hasattr(self, 'runner_thread') and self.runner_thread.isRunning():
+            self.runner_thread.quit()
+            self.runner_thread.wait()
 
         # 3. 完全退出应用
         QApplication.instance().quit()
@@ -401,7 +494,8 @@ class MonitorApp(QWidget):
             )
         else:
             # 从 runner 收集的输出中提取 traceback
-            lines = self.runner.output_lines
+            lines = getattr(self, 'runner_worker', None)
+            lines = lines.output_lines if lines else []
             tb_start = 0
             for i, line in enumerate(lines):
                 if line.startswith("Traceback (most recent call last):"):
@@ -456,6 +550,7 @@ def save_session(email: str):
 # ========== 程序入口 ==========
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    #print(os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"])
     if getattr(sys, 'frozen', False):
         base = sys._MEIPASS
     else:
